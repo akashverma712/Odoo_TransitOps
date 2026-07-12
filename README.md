@@ -21,7 +21,7 @@ TransitOps is a platform for organizations to manage their transit fleet — dri
 
 ---
 
-## 🖥️ Screenshot
+## 🖥️ Dashboard
 
 <div align="center">
   <img src="./Dashboard.jpeg" alt="TransitOps Officer Dashboard" width="800">
@@ -62,34 +62,6 @@ Odoo_TransitOps/
     │   └── src/pages/       # + Drivers, Vehicles, Trips, Reports (scaffolded)
     └── organizations/       # Organization-facing app: login, register, dashboard
 ```
-
----
-
-## ✅ Live Features (working end-to-end)
-
-- 🏢 **Organization Registration** — multi-field onboarding with duplicate-org checks and bcrypt-hashed passwords
-- 🔐 **Authentication** — JWT issued as an httpOnly cookie on login, verified by middleware on protected routes
-- 👤 **Session Management** — `GET /me` profile fetch and `POST /logout`
-- 🧑‍💼 **Role-Based Staff Accounts** — organizations can add employees under defined roles (Fleet Manager, Dispatcher, Safety Officer, Financial Analyst), enforced unique per role per org
-- 📊 **Officer Dashboard** (`frontend/Officer`) — main dashboard UI, fully connected to the endpoints above (see screenshot)
-
-## 🧩 Built but Not Yet Wired Up
-
-The backend has controller + migration logic already written for these modules, but their routes aren't mounted in `server.js` yet, so they aren't reachable via the API:
-
-- Drivers, Vehicles, Trips
-- Fuel logs, Maintenance
-- Documents, Notifications, Settings, Dashboard stats
-
-Mounting these is mostly a matter of importing and registering the existing route files in `server.js` — the underlying logic is already there.
-
-## 🗺️ Planned / In Progress on the Frontend
-
-- `frontend/Officer`: Drivers, Vehicles, Trips, and Reports pages are scaffolded (empty) — not yet built out
-- `frontend/organizations`: the dashboard currently calls an `/api/organization/employees` endpoint that doesn't exist yet on the backend, so the employee list won't load until that route is added
-- The two frontend apps (`Officer` and `organizations`) overlap significantly (both have login/register/dashboard for orgs) — worth consolidating into one app going forward
-
-Contributions toward any of the above are very welcome — see [Contributing](#-contributing).
 
 ---
 
@@ -178,8 +150,8 @@ Both run at `http://localhost:5173` by default (Vite).
 
 | Method | Endpoint                        | Auth | Description                     |
 |--------|-----------------------------------|:----:|-----------------------------------|
-| POST   | `/api/organization/register`      | ❌   | Register a new organization       |
-| POST   | `/api/organization/login`         | ❌   | Log in, sets JWT httpOnly cookie  |
+| POST   | `/api/organization/register`      | ✅    | Register a new organization       |
+| POST   | `/api/organization/login`         | ✅    | Log in, sets JWT httpOnly cookie  |
 | GET    | `/api/organization/me`            | ✅   | Get the logged-in org's profile   |
 | POST   | `/api/organization/logout`        | ✅   | Clear the session cookie          |
 | POST   | `/api/organization/users`         | ✅   | Create a staff account under the org |
@@ -203,14 +175,9 @@ curl -X POST http://localhost:<PORT>/api/organization/register \
 ## 🤝 Contributing
 
 1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/mount-driver-routes`)
+2. Create a feature branch 
 3. Commit your changes
 4. Open a PR against `main`
 
-**Good first issues:** mounting the driver/vehicle/trip/fuel/maintenance routes in `server.js`, building out the Officer frontend's Drivers/Vehicles/Trips/Reports pages, or adding the missing `/api/organization/employees` route.
-
----
-
-## 📄 License
 
 ISC
