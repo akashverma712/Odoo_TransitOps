@@ -12,8 +12,6 @@ export default function OrganisationLogin() {
 
   const [loading, setLoading] = useState(false);
 
-  // Theme toggle — same implementation/pattern as OrganisationDashboard.jsx,
-  // reused here purely for UI consistency. Does not touch any business logic.
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   const dark = theme === "dark";
 
