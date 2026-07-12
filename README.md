@@ -179,5 +179,3 @@ curl -X POST http://localhost:<PORT>/api/organization/register \
 3. Commit your changes
 4. Open a PR against `main`
 
-
-ISC
