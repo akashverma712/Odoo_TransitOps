@@ -1,9 +1,8 @@
 <div align="center">
 
-# 🚍 TransitOps — Officer Module
+# 🚍 TransitOps
 
 **Fleet & transit operations management platform**
-
 
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
@@ -18,7 +17,16 @@
 
 ## 📖 About
 
-TransitOps is a platform for organizations to manage their transit fleet — drivers, vehicles, trips, and reporting — from a single dashboard. This branch (`Officer`) covers the **organization onboarding and operator-facing side**: secure registration, authentication, role-based staff accounts, and the main dashboard.
+TransitOps is a platform for organizations to manage their transit fleet — drivers, vehicles, trips, fuel, maintenance, and reporting — from a single dashboard. It's split into a Node/Express + PostgreSQL backend and two React (Vite) frontend apps.
+
+---
+
+## 🖥️ Screenshot
+
+<div align="center">
+  <img src="./Dashboard.jpeg" alt="TransitOps Officer Dashboard" width="800">
+  <p><em>Officer Dashboard</em></p>
+</div>
 
 ---
 
@@ -33,49 +41,55 @@ TransitOps is a platform for organizations to manage their transit fleet — dri
 
 ---
 
-## ✨ Features
-
-- 🏢 **Organization Registration** — multi-field onboarding (org name, type, size, owner info) with duplicate-org checks and bcrypt-hashed passwords
-- 🔐 **Secure Authentication** — JWT issued as an httpOnly cookie on login, verified by middleware on every protected route
-- 👤 **Session Management** — profile fetch (`/me`) and logout endpoints for the authenticated organization
-- 🧑‍💼 **Role-Based Staff Accounts** — organizations can add employees under defined roles (Fleet Manager, Dispatcher, Safety Officer, Financial Analyst), with per-role uniqueness enforced per org
-- 📊 **Officer Dashboard** — central hub for the logged-in organization
-
-### 🗺️ Planned
-
-Scaffolded routes/pages reserved for upcoming work, not yet wired to the backend:
-
-- 🚚 Drivers management
-- 🚐 Vehicles management
-- 🧭 Trips management
-- 📈 Reports
-
-PRs toward these are very welcome — see [Contributing](#-contributing).
-
----
-
 ## 📁 Project Structure
 
 ```
 Odoo_TransitOps/
+├── Dashboard.jpeg
 ├── backend/
 │   ├── server.js
 │   ├── docker-compose.yml
 │   └── src/
 │       ├── config/          # DB connection + migration runner
-│       ├── controllers/     # organization + organizationUser logic
+│       ├── controllers/     # organization, organizationUser, driver, vehicle,
+│       │                    # trip, fuel, maintenance, document, notification,
+│       │                    # settings, dashboard
 │       ├── middleware/      # JWT auth middleware
-│       ├── migrations/      # SQL migration files
+│       ├── migrations/      # SQL migration files (001–010)
 │       └── routes/          # Express route definitions
 └── frontend/
-    └── Officer/
-        └── src/
-            ├── pages/        # Login, Register, Dashboard (+ planned modules)
-            ├── components/
-            ├── context/
-            ├── hooks/
-            └── services/
+    ├── Officer/             # Officer-facing app: login, register, dashboard
+    │   └── src/pages/       # + Drivers, Vehicles, Trips, Reports (scaffolded)
+    └── organizations/       # Organization-facing app: login, register, dashboard
 ```
+
+---
+
+## ✅ Live Features (working end-to-end)
+
+- 🏢 **Organization Registration** — multi-field onboarding with duplicate-org checks and bcrypt-hashed passwords
+- 🔐 **Authentication** — JWT issued as an httpOnly cookie on login, verified by middleware on protected routes
+- 👤 **Session Management** — `GET /me` profile fetch and `POST /logout`
+- 🧑‍💼 **Role-Based Staff Accounts** — organizations can add employees under defined roles (Fleet Manager, Dispatcher, Safety Officer, Financial Analyst), enforced unique per role per org
+- 📊 **Officer Dashboard** (`frontend/Officer`) — main dashboard UI, fully connected to the endpoints above (see screenshot)
+
+## 🧩 Built but Not Yet Wired Up
+
+The backend has controller + migration logic already written for these modules, but their routes aren't mounted in `server.js` yet, so they aren't reachable via the API:
+
+- Drivers, Vehicles, Trips
+- Fuel logs, Maintenance
+- Documents, Notifications, Settings, Dashboard stats
+
+Mounting these is mostly a matter of importing and registering the existing route files in `server.js` — the underlying logic is already there.
+
+## 🗺️ Planned / In Progress on the Frontend
+
+- `frontend/Officer`: Drivers, Vehicles, Trips, and Reports pages are scaffolded (empty) — not yet built out
+- `frontend/organizations`: the dashboard currently calls an `/api/organization/employees` endpoint that doesn't exist yet on the backend, so the employee list won't load until that route is added
+- The two frontend apps (`Officer` and `organizations`) overlap significantly (both have login/register/dashboard for orgs) — worth consolidating into one app going forward
+
+Contributions toward any of the above are very welcome — see [Contributing](#-contributing).
 
 ---
 
@@ -87,12 +101,11 @@ Odoo_TransitOps/
 - Docker & Docker Compose
 - npm
 
-### 1. Clone & switch branch
+### 1. Clone the repo
 
 ```bash
 git clone https://github.com/akashverma712/Odoo_TransitOps.git
 cd Odoo_TransitOps
-git checkout Officer
 ```
 
 ### 2. Configure environment variables
@@ -139,26 +152,65 @@ npm run dev
 ```
 Runs at `http://localhost:<PORT>`.
 
-### 6. Start the frontend
+### 6. Start a frontend
+
+Pick one of the two apps:
 
 ```bash
+# Officer app (recommended — fully connected)
 cd ../frontend/Officer
 npm install
 npm run dev
 ```
-Runs at `http://localhost:5173`.
+
+```bash
+# Organizations app
+cd ../frontend/organizations
+npm install
+npm run dev
+```
+
+Both run at `http://localhost:5173` by default (Vite).
 
 ---
 
+## 🔌 API Reference (currently mounted)
 
+| Method | Endpoint                        | Auth | Description                     |
+|--------|-----------------------------------|:----:|-----------------------------------|
+| POST   | `/api/organization/register`      | ❌   | Register a new organization       |
+| POST   | `/api/organization/login`         | ❌   | Log in, sets JWT httpOnly cookie  |
+| GET    | `/api/organization/me`            | ✅   | Get the logged-in org's profile   |
+| POST   | `/api/organization/logout`        | ✅   | Clear the session cookie          |
+| POST   | `/api/organization/users`         | ✅   | Create a staff account under the org |
+
+**Example — register:**
+```bash
+curl -X POST http://localhost:<PORT>/api/organization/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "organization_name": "Acme Transit",
+    "organization_type": "Private",
+    "number_of_workers": 25,
+    "owner_name": "Jane Doe",
+    "password": "yourpassword",
+    "is_registered": true
+  }'
+```
+
+---
 
 ## 🤝 Contributing
 
 1. Fork the repo
-2. Create a feature branch
+2. Create a feature branch (`git checkout -b feature/mount-driver-routes`)
 3. Commit your changes
 4. Open a PR against `main`
 
-Priority areas: Drivers, Vehicles, Trips, and Reports modules.
+**Good first issues:** mounting the driver/vehicle/trip/fuel/maintenance routes in `server.js`, building out the Officer frontend's Drivers/Vehicles/Trips/Reports pages, or adding the missing `/api/organization/employees` route.
 
 ---
+
+## 📄 License
+
+ISC
