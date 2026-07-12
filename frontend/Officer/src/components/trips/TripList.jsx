@@ -1,11 +1,170 @@
 // src/components/trips/TripList.jsx
 import { useState, useEffect } from "react";
-import { Plus, Search, Eye, MapPin, Truck, User, Calendar } from "lucide-react";
+import { 
+  Plus, 
+  Search, 
+  Eye, 
+  MapPin, 
+  Truck, 
+  User, 
+  Calendar,
+  FileText,
+  Send,
+  CheckCircle,
+  XCircle,
+  AlertCircle
+} from "lucide-react";
 import api from "../../config/axios";
 import TripForm from "./TripForm";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ErrorAlert from "../common/ErrorAlert";
 import SuccessAlert from "../common/SuccessAlert";
+
+// Dummy data for testing
+const DUMMY_TRIPS = [
+  {
+    id: 1,
+    source: "Mumbai",
+    destination: "Delhi",
+    status: "Draft",
+    cargo_weight: 2500,
+    planned_distance: 1400,
+    vehicle_id: 1,
+    driver_id: 1,
+    created_at: "2026-01-15T10:30:00Z",
+    vehicle: {
+      registration_number: "MH-01-AB-1234",
+    },
+    driver: {
+      full_name: "Rajesh Kumar",
+    },
+  },
+  {
+    id: 2,
+    source: "Bangalore",
+    destination: "Chennai",
+    status: "Dispatched",
+    cargo_weight: 1800,
+    planned_distance: 350,
+    vehicle_id: 2,
+    driver_id: 2,
+    created_at: "2026-01-14T09:15:00Z",
+    vehicle: {
+      registration_number: "KA-02-CD-5678",
+    },
+    driver: {
+      full_name: "Priya Sharma",
+    },
+  },
+  {
+    id: 3,
+    source: "Delhi",
+    destination: "Jaipur",
+    status: "Completed",
+    cargo_weight: 1200,
+    planned_distance: 280,
+    fuel_consumed: 45.5,
+    vehicle_id: 3,
+    driver_id: 3,
+    created_at: "2026-01-13T14:45:00Z",
+    vehicle: {
+      registration_number: "DL-03-EF-9012",
+    },
+    driver: {
+      full_name: "Amit Singh",
+    },
+  },
+  {
+    id: 4,
+    source: "Hyderabad",
+    destination: "Pune",
+    status: "Cancelled",
+    cargo_weight: 3000,
+    planned_distance: 560,
+    vehicle_id: 4,
+    driver_id: 4,
+    created_at: "2026-01-12T08:00:00Z",
+    vehicle: {
+      registration_number: "TS-04-GH-3456",
+    },
+    driver: {
+      full_name: "Sneha Patel",
+    },
+  },
+  {
+    id: 5,
+    source: "Kolkata",
+    destination: "Bhubaneswar",
+    status: "Dispatched",
+    cargo_weight: 2200,
+    planned_distance: 440,
+    vehicle_id: 5,
+    driver_id: 5,
+    created_at: "2026-01-16T11:20:00Z",
+    vehicle: {
+      registration_number: "WB-05-IJ-7890",
+    },
+    driver: {
+      full_name: "Vikram Reddy",
+    },
+  },
+  {
+    id: 6,
+    source: "Ahmedabad",
+    destination: "Mumbai",
+    status: "Completed",
+    cargo_weight: 1500,
+    planned_distance: 520,
+    fuel_consumed: 65.8,
+    vehicle_id: 6,
+    driver_id: 6,
+    created_at: "2026-01-11T16:30:00Z",
+    vehicle: {
+      registration_number: "GJ-06-KL-1234",
+    },
+    driver: {
+      full_name: "Meena Gupta",
+    },
+  },
+  {
+    id: 7,
+    source: "Chennai",
+    destination: "Coimbatore",
+    status: "Draft",
+    cargo_weight: 800,
+    planned_distance: 500,
+    vehicle_id: 7,
+    driver_id: 7,
+    created_at: "2026-01-17T07:45:00Z",
+    vehicle: {
+      registration_number: "TN-07-MN-5678",
+    },
+    driver: {
+      full_name: "Karthik Rajan",
+    },
+  },
+  {
+    id: 8,
+    source: "Pune",
+    destination: "Nagpur",
+    status: "Completed",
+    cargo_weight: 2800,
+    planned_distance: 710,
+    fuel_consumed: 82.3,
+    vehicle_id: 8,
+    driver_id: 8,
+    created_at: "2026-01-10T13:15:00Z",
+    vehicle: {
+      registration_number: "MH-08-OP-9012",
+    },
+    driver: {
+      full_name: "Sunita Deshmukh",
+    },
+  },
+];
+
+// Set this to false to use real API, true to use dummy data
+const USE_DUMMY_DATA = true; // Change this to false when you want to use real API
 
 const TripList = () => {
   const [trips, setTrips] = useState([]);
@@ -15,6 +174,7 @@ const TripList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
+  const [useDummyData, setUseDummyData] = useState(USE_DUMMY_DATA);
   const [filters, setFilters] = useState({
     status: "",
     vehicle_id: "",
@@ -22,27 +182,53 @@ const TripList = () => {
   });
 
   useEffect(() => {
-    fetchTrips();
+    fetchTrips(useDummyData);
   }, []);
 
-  const fetchTrips = async () => {
+  const fetchTrips = async (useDummy = false) => {
     try {
       setLoading(true);
-      const response = await api.get("/trips");
-      setTrips(response.data.data || []);
+      if (useDummy) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setTrips(DUMMY_TRIPS);
+        setError("");
+      } else {
+        const response = await api.get("/trips");
+        setTrips(response.data.data || []);
+      }
     } catch (err) {
-      setError("Failed to load trips");
-      console.error(err);
+      // If API fails, fallback to dummy data
+      if (!useDummy) {
+        console.warn("API failed, falling back to dummy data");
+        setTrips(DUMMY_TRIPS);
+        setError("Using demo data (API connection failed)");
+        setTimeout(() => setError(""), 5000);
+      } else {
+        setError("Failed to load trips");
+        console.error(err);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleDispatch = async (id) => {
+    if (useDummyData) {
+      // Simulate API call for dummy data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setTrips(trips.map(trip => 
+        trip.id === id ? { ...trip, status: "Dispatched" } : trip
+      ));
+      setSuccess("Trip dispatched successfully (demo)");
+      setTimeout(() => setSuccess(""), 3000);
+      return;
+    }
+
     try {
       await api.put(`/trips/${id}/dispatch`);
       setSuccess("Trip dispatched successfully");
-      fetchTrips();
+      fetchTrips(useDummyData);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to dispatch trip");
@@ -51,10 +237,26 @@ const TripList = () => {
   };
 
   const handleComplete = async (id, finalOdometer, fuelConsumed) => {
+    if (useDummyData) {
+      // Simulate API call for dummy data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setTrips(trips.map(trip => 
+        trip.id === id ? { 
+          ...trip, 
+          status: "Completed", 
+          fuel_consumed: fuelConsumed,
+          final_odometer: finalOdometer
+        } : trip
+      ));
+      setSuccess("Trip completed successfully (demo)");
+      setTimeout(() => setSuccess(""), 3000);
+      return;
+    }
+
     try {
       await api.put(`/trips/${id}/complete`, { final_odometer: finalOdometer, fuel_consumed: fuelConsumed });
       setSuccess("Trip completed successfully");
-      fetchTrips();
+      fetchTrips(useDummyData);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to complete trip");
@@ -65,10 +267,21 @@ const TripList = () => {
   const handleCancel = async (id) => {
     if (!window.confirm("Are you sure you want to cancel this trip?")) return;
 
+    if (useDummyData) {
+      // Simulate API call for dummy data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setTrips(trips.map(trip => 
+        trip.id === id ? { ...trip, status: "Cancelled" } : trip
+      ));
+      setSuccess("Trip cancelled successfully (demo)");
+      setTimeout(() => setSuccess(""), 3000);
+      return;
+    }
+
     try {
       await api.put(`/trips/${id}/cancel`);
       setSuccess("Trip cancelled successfully");
-      fetchTrips();
+      fetchTrips(useDummyData);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to cancel trip");
@@ -86,14 +299,19 @@ const TripList = () => {
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
+  // Updated to use Lucide icons
   const getStatusIcon = (status) => {
-    const icons = {
-      Draft: "📝",
-      Dispatched: "🚚",
-      Completed: "✅",
-      Cancelled: "❌",
+    const iconMap = {
+      Draft: FileText,
+      Dispatched: Send,
+      Completed: CheckCircle,
+      Cancelled: XCircle,
     };
-    return icons[status] || "📋";
+    
+    const IconComponent = iconMap[status] || AlertCircle;
+    
+    // Return the icon component with className for styling
+    return <IconComponent className="h-8 w-8" />;
   };
 
   const filteredTrips = trips.filter((trip) => {
@@ -121,6 +339,11 @@ const TripList = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Trips</h1>
           <p className="text-gray-500">Manage your transport trips</p>
+          {useDummyData && (
+            <span className="inline-block mt-1 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+              Demo Mode
+            </span>
+          )}
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -173,7 +396,9 @@ const TripList = () => {
             <div className="p-6">
               <div className="flex flex-wrap justify-between items-start gap-4">
                 <div className="flex items-start space-x-4 flex-1">
-                  <div className="text-3xl">{getStatusIcon(trip.status)}</div>
+                  <div className="flex items-center justify-center w-12 h-12 bg-gray-50 rounded-lg">
+                    {getStatusIcon(trip.status)}
+                  </div>
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3">
                       <h3 className="text-lg font-semibold text-gray-800">
@@ -306,7 +531,7 @@ const TripList = () => {
             <TripForm
               trip={editingTrip}
               onSuccess={() => {
-                fetchTrips();
+                fetchTrips(useDummyData);
                 setShowForm(false);
                 setEditingTrip(null);
                 setSuccess(

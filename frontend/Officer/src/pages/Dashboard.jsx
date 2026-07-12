@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import api from "../config/axios";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorAlert from "../components/common/ErrorAlert";
 import {
@@ -22,26 +21,103 @@ import {
   BarChart3,
 } from "lucide-react";
 
+// Dummy data
+const DUMMY_KPIS = {
+  activeVehicles: 24,
+  availableVehicles: 18,
+  vehiclesInMaintenance: 6,
+  activeTrips: 12,
+  pendingTrips: 8,
+  driversOnDuty: 15,
+  fleetUtilization: 72,
+  totalRevenue: 284500,
+  totalExpenses: 189200,
+  fuelEfficiency: 8.4,
+};
+
+const DUMMY_TRIPS = [
+  {
+    id: 1,
+    source: "New York",
+    destination: "Boston",
+    status: "Completed",
+    created_at: "2026-07-10T14:30:00Z",
+  },
+  {
+    id: 2,
+    source: "Los Angeles",
+    destination: "San Francisco",
+    status: "Dispatched",
+    created_at: "2026-07-11T09:15:00Z",
+  },
+  {
+    id: 3,
+    source: "Chicago",
+    destination: "Detroit",
+    status: "Draft",
+    created_at: "2026-07-11T16:45:00Z",
+  },
+  {
+    id: 4,
+    source: "Miami",
+    destination: "Orlando",
+    status: "Completed",
+    created_at: "2026-07-10T08:20:00Z",
+  },
+  {
+    id: 5,
+    source: "Seattle",
+    destination: "Portland",
+    status: "Dispatched",
+    created_at: "2026-07-11T11:00:00Z",
+  },
+];
+
+const DUMMY_MAINTENANCE = [
+  {
+    id: 1,
+    vehicle: { registration_number: "TRUCK-01" },
+    priority: "High",
+  },
+  {
+    id: 2,
+    vehicle: { registration_number: "VAN-03" },
+    priority: "Medium",
+  },
+  {
+    id: 3,
+    vehicle: { registration_number: "CAR-07" },
+    priority: "Low",
+  },
+];
+
+const DUMMY_EXPIRING_LICENSES = [
+  {
+    id: 1,
+    full_name: "John Doe",
+    license_expiry_date: "2026-07-25",
+  },
+  {
+    id: 2,
+    full_name: "Sarah Smith",
+    license_expiry_date: "2026-08-05",
+  },
+  {
+    id: 3,
+    full_name: "Mike Johnson",
+    license_expiry_date: "2026-08-15",
+  },
+];
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [kpis, setKpis] = useState({
-    activeVehicles: 0,
-    availableVehicles: 0,
-    vehiclesInMaintenance: 0,
-    activeTrips: 0,
-    pendingTrips: 0,
-    driversOnDuty: 0,
-    fleetUtilization: 0,
-    totalRevenue: 0,
-    totalExpenses: 0,
-    fuelEfficiency: 0,
-  });
-  const [recentTrips, setRecentTrips] = useState([]);
-  const [upcomingMaintenance, setUpcomingMaintenance] = useState([]);
-  const [expiringLicenses, setExpiringLicenses] = useState([]);
+  const [kpis, setKpis] = useState(DUMMY_KPIS);
+  const [recentTrips, setRecentTrips] = useState(DUMMY_TRIPS);
+  const [upcomingMaintenance, setUpcomingMaintenance] = useState(DUMMY_MAINTENANCE);
+  const [expiringLicenses, setExpiringLicenses] = useState(DUMMY_EXPIRING_LICENSES);
   const [filters, setFilters] = useState({
     vehicleType: "",
     status: "",
@@ -49,60 +125,14 @@ const Dashboard = () => {
   });
   const [timeRange, setTimeRange] = useState("week");
 
+  // Simulate loading
   useEffect(() => {
-    fetchDashboardData();
-    fetchRecentTrips();
-    fetchUpcomingMaintenance();
-    fetchExpiringLicenses();
-  }, [filters, timeRange]);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get("/dashboard/kpis", { 
-        params: { ...filters, range: timeRange } 
-      });
-      setKpis(response.data.data || kpis);
-    } catch (err) {
-      setError("Failed to load dashboard data");
-      console.error(err);
-    } finally {
+    setLoading(true);
+    const timer = setTimeout(() => {
       setLoading(false);
-    }
-  };
-
-  const fetchRecentTrips = async () => {
-    try {
-      const response = await api.get("/trips", { 
-        params: { limit: 5, sort: "-created_at" } 
-      });
-      setRecentTrips(response.data.data || []);
-    } catch (err) {
-      console.error("Failed to fetch recent trips:", err);
-    }
-  };
-
-  const fetchUpcomingMaintenance = async () => {
-    try {
-      const response = await api.get("/maintenance", { 
-        params: { status: "Scheduled", limit: 5 } 
-      });
-      setUpcomingMaintenance(response.data.data || []);
-    } catch (err) {
-      console.error("Failed to fetch maintenance:", err);
-    }
-  };
-
-  const fetchExpiringLicenses = async () => {
-    try {
-      const response = await api.get("/drivers/expiring-licenses", { 
-        params: { days: 30 } 
-      });
-      setExpiringLicenses(response.data.data || []);
-    } catch (err) {
-      console.error("Failed to fetch expiring licenses:", err);
-    }
-  };
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [filters, timeRange]);
 
   const getStatusColor = (status) => {
     const colors = {
@@ -165,7 +195,7 @@ const Dashboard = () => {
       <div className="flex flex-wrap justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            Welcome back, {user?.organization_name || "User"}!
+            Welcome back, {user?.organization_name || "Demo Organization"}!
           </h1>
           <p className="text-gray-500">Here's what's happening with your fleet</p>
         </div>

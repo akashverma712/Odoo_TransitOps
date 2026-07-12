@@ -12,6 +12,7 @@ import Reports from "./components/reports/Reports";
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import LoadingSpinner from "./components/common/LoadingSpinner";
+import FuelExpenses from "./components/expenses/ExpenseList";
 
 // Protected Layout Component
 const ProtectedLayout = ({ children }) => {
@@ -33,7 +34,7 @@ const ProtectedLayout = ({ children }) => {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar user={user} />
+        {/* <Navbar user={user} /> */}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
@@ -114,6 +115,16 @@ function App() {
             <ProtectedRoute>
               <ProtectedLayout>
                 <MaintenanceList />
+              </ProtectedLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/expenses"
+          element={
+            <ProtectedRoute>
+              <ProtectedLayout>
+                <FuelExpenses />
               </ProtectedLayout>
             </ProtectedRoute>
           }
