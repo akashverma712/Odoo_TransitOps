@@ -1,25 +1,20 @@
 // src/components/FilterToolbar.jsx
 //
-// Toolbar bar above the vehicle table: search, filters, sort, export,
-// and the primary "Add Vehicle" action.
+// Toolbar above the vehicle table. Per the finalized spec, this now holds
+// only: Search Vehicle, Vehicle Type filter, Status filter, Registration
+// Number search, and the Add Vehicle action. Capacity filter, sort
+// dropdown, and export have been removed.
+//
+// NOTE ON FILTER SHAPE: this toolbar reports its state as
+//   { search, regNumber, type, status }
+// If the parent page (VehicleRegistry.jsx) still expects the older shape
+// (search/type/status/capacity/sort), its filtering logic will need a small
+// update to read `search` (matches vehicleName) and `regNumber` (matches
+// registrationNumber) instead of the old combined/capacity/sort fields.
 
-import { Download, Plus, ChevronDown } from "lucide-react";
+import { Plus, ChevronDown } from "lucide-react";
 import SearchInput from "./SearchInput";
 import { VEHICLE_TYPES, VEHICLE_STATUSES } from "../data/vehicles";
-
-const CAPACITY_BANDS = [
-  { label: "All Capacities", value: "all" },
-  { label: "Up to 1,000 kg", value: "0-1000" },
-  { label: "1,000 – 5,000 kg", value: "1000-5000" },
-  { label: "Above 5,000 kg", value: "5000-999999" },
-];
-
-const SORT_OPTIONS = [
-  { label: "Newest First", value: "newest" },
-  { label: "Registration No. (A–Z)", value: "reg-asc" },
-  { label: "Odometer (High – Low)", value: "odometer-desc" },
-  { label: "Capacity (High – Low)", value: "capacity-desc" },
-];
 
 function Select({ value, onChange, options }) {
   return (
@@ -40,7 +35,7 @@ function Select({ value, onChange, options }) {
   );
 }
 
-export default function FilterToolbar({ filters, onFilterChange, onExport, onAddVehicle }) {
+export default function FilterToolbar({ filters, onFilterChange, onAddVehicle }) {
   const typeOptions = [
     { label: "All Types", value: "all" },
     ...VEHICLE_TYPES.map((t) => ({ label: t, value: t })),
@@ -56,7 +51,12 @@ export default function FilterToolbar({ filters, onFilterChange, onExport, onAdd
         <SearchInput
           value={filters.search}
           onChange={(v) => onFilterChange({ ...filters, search: v })}
-          placeholder="Search reg. no. or vehicle name..."
+          placeholder="Search vehicle name..."
+        />
+        <SearchInput
+          value={filters.regNumber}
+          onChange={(v) => onFilterChange({ ...filters, regNumber: v })}
+          placeholder="Search registration no..."
         />
         <Select
           value={filters.type}
@@ -68,27 +68,9 @@ export default function FilterToolbar({ filters, onFilterChange, onExport, onAdd
           onChange={(v) => onFilterChange({ ...filters, status: v })}
           options={statusOptions}
         />
-        <Select
-          value={filters.capacity}
-          onChange={(v) => onFilterChange({ ...filters, capacity: v })}
-          options={CAPACITY_BANDS}
-        />
-        <Select
-          value={filters.sort}
-          onChange={(v) => onFilterChange({ ...filters, sort: v })}
-          options={SORT_OPTIONS}
-        />
       </div>
 
       <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={onExport}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-transparent px-3.5 py-2 text-sm font-medium text-[#C4C9D2] transition-colors hover:bg-white/[0.05]"
-        >
-          <Download className="h-4 w-4" />
-          Export
-        </button>
         <button
           type="button"
           onClick={onAddVehicle}

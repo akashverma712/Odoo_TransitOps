@@ -1,57 +1,109 @@
 // src/components/AddVehicleModal.jsx
 //
-// Frontend-only "Add Vehicle" form. On save, it currently just calls the
-// onSave callback with the new record.
+// Frontend-only "Add Vehicle" form, trimmed to the finalized field spec:
+// Registration Number, Vehicle Name/Model, Vehicle Type, Capacity,
+// Odometer Reading, Acquisition Cost, Status. Validation is frontend-only —
+// no backend calls are made.
 //
 // BACKEND INTEGRATION NOTE:
 // Swap the onSave handler in the parent page for a real POST request, e.g.
 //   await fetch('/api/vehicles', { method: 'POST', body: JSON.stringify(form) })
-// and handle loading/error state around the Save button.
+// and add a server-side uniqueness check on registrationNumber.
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import { VEHICLE_TYPES, FUEL_TYPES, VEHICLE_STATUSES } from "../data/vehicles";
+import { VEHICLE_TYPES, VEHICLE_STATUSES } from "../data/vehicles";
 
 const EMPTY_FORM = {
-  regNumber: "",
-  name: "",
-  type: VEHICLE_TYPES[0],
-  capacityKg: "",
-  fuelType: FUEL_TYPES[0],
-  purchaseDate: "",
-  insuranceExpiry: "",
-  odometerKm: "",
+  registrationNumber: "",
+  vehicleName: "",
+  vehicleType: VEHICLE_TYPES[0],
+  capacity: "",
+  odometerReading: "",
+  acquisitionCost: "",
   status: VEHICLE_STATUSES[0],
 };
 
-function Field({ label, children }) {
+function Field({ label, error, children }) {
   return (
     <label className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-[#8B93A1]">{label}</span>
       {children}
+      {error && <span className="text-xs text-rose-400">{error}</span>}
     </label>
   );
 }
 
-const inputClass =
-  "w-full rounded-lg border border-white/[0.08] bg-[#0E1116] px-3 py-2 text-sm text-[#E8EAED] outline-none transition-colors focus:border-[#4C8DFF]/50 focus:ring-1 focus:ring-[#4C8DFF]/30";
+const inputClass = (hasError) =>
+  `w-full rounded-lg border bg-[#0E1116] px-3 py-2 text-sm text-[#E8EAED] outline-none transition-colors focus:ring-1 ${
+    hasError
+      ? "border-rose-400/60 focus:border-rose-400/60 focus:ring-rose-400/30"
+      : "border-white/[0.08] focus:border-[#4C8DFF]/50 focus:ring-[#4C8DFF]/30"
+  }`;
 
-export default function AddVehicleModal({ open, onClose, onSave }) {
+function validate(form, existingRegNumbers) {
+  const errors = {};
+
+  if (!form.registrationNumber.trim()) {
+    errors.registrationNumber = "Registration number is required.";
+  } else if (
+    existingRegNumbers
+      .map((r) => r.toLowerCase())
+      .includes(form.registrationNumber.trim().toLowerCase())
+  ) {
+    errors.registrationNumber = "This registration number already exists.";
+  }
+
+  if (!form.vehicleName.trim()) {
+    errors.vehicleName = "Vehicle name / model is required.";
+  }
+
+  if (!form.capacity || Number(form.capacity) <= 0) {
+    errors.capacity = "Enter a capacity greater than 0.";
+  }
+
+  if (form.odometerReading === "" || Number(form.odometerReading) < 0) {
+    errors.odometerReading = "Enter a valid odometer reading.";
+  }
+
+  if (!form.acquisitionCost || Number(form.acquisitionCost) <= 0) {
+    errors.acquisitionCost = "Enter an acquisition cost greater than 0.";
+  }
+
+  return errors;
+}
+
+export default function AddVehicleModal({ open, onClose, onSave, existingRegNumbers = [] }) {
   const [form, setForm] = useState(EMPTY_FORM);
+  const [errors, setErrors] = useState({});
 
   if (!open) return null;
 
-  const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  const update = (key) => (e) => {
+    setForm((f) => ({ ...f, [key]: e.target.value }));
+    setErrors((err) => ({ ...err, [key]: undefined }));
+  };
+
+  const handleClose = () => {
+    setForm(EMPTY_FORM);
+    setErrors({});
+    onClose();
+  };
 
   const handleSave = () => {
-    // Minimal frontend validation — extend once backend rules are wired in.
-    if (!form.regNumber.trim() || !form.name.trim()) return;
+    const validationErrors = validate(form, existingRegNumbers);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
     onSave({
       ...form,
-      capacityKg: Number(form.capacityKg) || 0,
-      odometerKm: Number(form.odometerKm) || 0,
+      capacity: Number(form.capacity),
+      odometerReading: Number(form.odometerReading),
+      acquisitionCost: Number(form.acquisitionCost),
     });
     setForm(EMPTY_FORM);
+    setErrors({});
   };
 
   return (
@@ -67,7 +119,7 @@ export default function AddVehicleModal({ open, onClose, onSave }) {
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close"
             className="rounded-md p-1.5 text-[#8B93A1] transition-colors hover:bg-white/[0.06] hover:text-[#E8EAED]"
           >
@@ -76,24 +128,28 @@ export default function AddVehicleModal({ open, onClose, onSave }) {
         </div>
 
         <div className="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-2">
-          <Field label="Registration Number">
+          <Field label="Registration Number (Unique)" error={errors.registrationNumber}>
             <input
-              className={inputClass}
-              value={form.regNumber}
-              onChange={update("regNumber")}
+              className={inputClass(errors.registrationNumber)}
+              value={form.registrationNumber}
+              onChange={update("registrationNumber")}
               placeholder="GJ01AB1234"
             />
           </Field>
-          <Field label="Vehicle Name">
+          <Field label="Vehicle Name / Model" error={errors.vehicleName}>
             <input
-              className={inputClass}
-              value={form.name}
-              onChange={update("name")}
+              className={inputClass(errors.vehicleName)}
+              value={form.vehicleName}
+              onChange={update("vehicleName")}
               placeholder="VAN-05"
             />
           </Field>
           <Field label="Vehicle Type">
-            <select className={inputClass} value={form.type} onChange={update("type")}>
+            <select
+              className={inputClass(false)}
+              value={form.vehicleType}
+              onChange={update("vehicleType")}
+            >
               {VEHICLE_TYPES.map((t) => (
                 <option key={t} value={t} className="bg-[#12151B]">
                   {t}
@@ -101,51 +157,39 @@ export default function AddVehicleModal({ open, onClose, onSave }) {
               ))}
             </select>
           </Field>
-          <Field label="Capacity (kg)">
+          <Field label="Capacity (kg)" error={errors.capacity}>
             <input
               type="number"
-              className={inputClass}
-              value={form.capacityKg}
-              onChange={update("capacityKg")}
+              className={inputClass(errors.capacity)}
+              value={form.capacity}
+              onChange={update("capacity")}
               placeholder="500"
             />
           </Field>
-          <Field label="Fuel Type">
-            <select className={inputClass} value={form.fuelType} onChange={update("fuelType")}>
-              {FUEL_TYPES.map((f) => (
-                <option key={f} value={f} className="bg-[#12151B]">
-                  {f}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Current Odometer (km)">
+          <Field label="Odometer Reading (km)" error={errors.odometerReading}>
             <input
               type="number"
-              className={inputClass}
-              value={form.odometerKm}
-              onChange={update("odometerKm")}
+              className={inputClass(errors.odometerReading)}
+              value={form.odometerReading}
+              onChange={update("odometerReading")}
               placeholder="0"
             />
           </Field>
-          <Field label="Purchase Date">
+          <Field label="Acquisition Cost (₹)" error={errors.acquisitionCost}>
             <input
-              type="date"
-              className={inputClass}
-              value={form.purchaseDate}
-              onChange={update("purchaseDate")}
-            />
-          </Field>
-          <Field label="Insurance Expiry">
-            <input
-              type="date"
-              className={inputClass}
-              value={form.insuranceExpiry}
-              onChange={update("insuranceExpiry")}
+              type="number"
+              className={inputClass(errors.acquisitionCost)}
+              value={form.acquisitionCost}
+              onChange={update("acquisitionCost")}
+              placeholder="620000"
             />
           </Field>
           <Field label="Status">
-            <select className={inputClass} value={form.status} onChange={update("status")}>
+            <select
+              className={inputClass(false)}
+              value={form.status}
+              onChange={update("status")}
+            >
               {VEHICLE_STATUSES.map((s) => (
                 <option key={s} value={s} className="bg-[#12151B]">
                   {s}
@@ -158,7 +202,7 @@ export default function AddVehicleModal({ open, onClose, onSave }) {
         <div className="flex items-center justify-end gap-2 border-t border-white/[0.06] px-6 py-4">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-lg border border-white/[0.08] px-4 py-2 text-sm font-medium text-[#C4C9D2] transition-colors hover:bg-white/[0.05]"
           >
             Cancel

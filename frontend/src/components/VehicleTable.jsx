@@ -1,22 +1,19 @@
 // src/components/VehicleTable.jsx
 //
-// Table shell for the Vehicle Registry. Wrapped in an overflow-x-auto
-// container so it degrades to horizontal scroll on tablet/mobile instead
-// of breaking the layout.
+// Table shell for the Vehicle Registry, trimmed to the finalized column
+// spec. Wrapped in an overflow-x-auto container so it degrades to
+// horizontal scroll on tablet/mobile instead of breaking the layout.
 
 import VehicleRow from "./VehicleRow";
 import EmptyState from "./EmptyState";
 
 const COLUMNS = [
-  "Registration No.",
-  "Vehicle Name",
-  "Type",
+  "Registration Number",
+  "Name / Model",
+  "Vehicle Type",
   "Capacity",
-  "Driver Assigned",
-  "Current Location",
-  "Odometer",
-  "Fuel Level",
-  "Last Service",
+  "Odometer Reading",
+  "Acquisition Cost",
   "Status",
   "Actions",
 ];
@@ -29,7 +26,7 @@ export default function VehicleTable({ vehicles, onView, onEdit, onDelete, onAdd
   return (
     <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-[#12151B]">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1080px] border-collapse text-left">
+        <table className="w-full min-w-[860px] border-collapse text-left">
           <thead>
             <tr className="border-b border-white/[0.06]">
               {COLUMNS.map((col) => (
