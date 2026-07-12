@@ -1,26 +1,8 @@
 import { useState } from "react";
-<<<<<<< HEAD
-import { useNavigate } from "react-router-dom";
-import {
-  Building2,
-  Users2,
-  UserRound,
-  KeyRound,
-  ArrowRight,
-  CheckCircle2,
-  AlertCircle,
-} from "lucide-react";
-=======
->>>>>>> 2f1536a047a46465357d54df6456d2133cf217c0
 
 const FIELD_COUNT = 6;
 
 export default function OrganisationRegister() {
-<<<<<<< HEAD
-  const navigate = useNavigate();
-
-=======
->>>>>>> 2f1536a047a46465357d54df6456d2133cf217c0
   const [formData, setFormData] = useState({
     organization_name: "",
     organization_type: "",
@@ -32,10 +14,6 @@ export default function OrganisationRegister() {
 
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState(null);
-<<<<<<< HEAD
-  const [submitted, setSubmitted] = useState(false);
-=======
->>>>>>> 2f1536a047a46465357d54df6456d2133cf217c0
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,8 +24,6 @@ export default function OrganisationRegister() {
     setFormData((prev) => ({ ...prev, is_registered: value }));
   };
 
-<<<<<<< HEAD
-=======
   const resetForm = () => {
     setFormData({
       organization_name: "",
@@ -59,7 +35,6 @@ export default function OrganisationRegister() {
     });
   };
 
->>>>>>> 2f1536a047a46465357d54df6456d2133cf217c0
   const handleSubmit = async (e) => {
     e.preventDefault();
 
