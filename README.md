@@ -23,10 +23,8 @@ TransitOps is a platform for organizations to manage their transit fleet — dri
 
 ## 🖥️ Screenshot
 
-<div align="center">
-  <img src="./Dashboard.jpeg" alt="TransitOps Officer Dashboard" width="800">
-  <p><em>Officer Dashboard</em></p>
-</div>
+<img width="1885" height="946" alt="image" src="https://github.com/user-attachments/assets/c698f3aa-2d6d-4d08-b793-50778f3b1a96" />
+
 
 ---
 
