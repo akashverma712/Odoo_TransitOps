@@ -10,6 +10,10 @@ import {
   Sun,
   Moon,
   Loader2,
+  Ban,
+  PauseCircle,
+  Mail,
+  UsersRound,
 } from "lucide-react";
 
 export default function OrganisationDashboard() {
@@ -18,11 +22,13 @@ export default function OrganisationDashboard() {
   const [organization, setOrganization] = useState(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
+  const [employees, setEmployees] = useState([]);
 
   const dark = theme === "dark";
 
   useEffect(() => {
     fetchOrganization();
+    fetchEmployees();
   }, []);
 
   useEffect(() => {
@@ -51,6 +57,52 @@ export default function OrganisationDashboard() {
     }
   };
 
+  // Best-effort fetch of already-registered employees on load. If this
+  // endpoint isn't wired up on the backend yet, it fails silently and
+  // the list just starts empty for the session.
+  const fetchEmployees = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/organization/employees", {
+        credentials: "include",
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (Array.isArray(data.employees)) {
+        setEmployees(data.employees.map((e) => ({ status: "active", ...e })));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Pass this to each EmployeeCard as `onCreated`, and have EmployeeCard
+  // call it with the new employee's data right after its own submit
+  // succeeds — that's what makes the new hire show up here instantly.
+  const handleEmployeeAdded = (employee) => {
+    setEmployees((prev) => [
+      { id: employee.id || `${Date.now()}`, status: "active", ...employee },
+      ...prev,
+    ]);
+  };
+
+  // Dummy for now — no backend call yet, just flips local status.
+  const handleSuspend = (id) => {
+    setEmployees((prev) =>
+      prev.map((e) =>
+        e.id === id ? { ...e, status: e.status === "suspended" ? "active" : "suspended" } : e
+      )
+    );
+  };
+
+  // Dummy for now — no backend call yet, just flips local status.
+  const handleBan = (id) => {
+    setEmployees((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, status: e.status === "banned" ? "active" : "banned" } : e))
+    );
+  };
+
   const handleLogout = async () => {
     try {
       await fetch("http://localhost:5000/api/organization/logout", {
@@ -77,6 +129,21 @@ export default function OrganisationDashboard() {
   const textSecondary = dark ? "text-[#9AA3B5]" : "text-[#667085]";
   const textMuted = dark ? "text-[#6B7386]" : "text-[#8A93A6]";
   const tileBg = dark ? "bg-[#161927] border-[#232838]" : "bg-[#FAFAFC] border-[#EDEEF3]";
+  const memberCardBg = dark ? "bg-[#161927] border-[#232838]" : "bg-white border-[#EDEEF3]";
+  const iconChipBg = dark ? "bg-[#1E2233]" : "bg-[#EEF0FB]";
+  const emptyStateBg = dark ? "bg-[#12141F] border-[#232838]" : "bg-[#FAFAFC] border-[#EDEEF3]";
+
+  const statusStyles = {
+    active: dark
+      ? "bg-[#17A398]/15 text-[#3FC6B4] border-[#17A398]/30"
+      : "bg-[#E7F8F5] text-[#0F8577] border-[#BFEBE3]",
+    suspended: dark
+      ? "bg-[#D48806]/15 text-[#F0A93B] border-[#D48806]/30"
+      : "bg-[#FEF3E2] text-[#B25E09] border-[#FBE0B0]",
+    banned: dark
+      ? "bg-[#E5534B]/15 text-[#F0857D] border-[#E5534B]/30"
+      : "bg-[#FBEAE6] text-[#D0403A] border-[#F3D4D2]",
+  };
 
   if (loading) {
     return (
