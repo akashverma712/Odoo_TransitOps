@@ -17,12 +17,12 @@ const Sidebar = () => {
 
   const menuItems = [
     { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { path: "/vehicles", icon: Truck, label: "Vehicles" },
+    { path: "/Vehicles", icon: Truck, label: "Fleet" },
     { path: "/drivers", icon: Users, label: "Drivers" },
     { path: "/trips", icon: MapPin, label: "Trips" },
     { path: "/maintenance", icon: Wrench, label: "Maintenance" },
-    { path: "/expenses", icon: DollarSign, label: "Expenses" },
-    { path: "/reports", icon: FileText, label: "Reports" },
+    { path: "/expenses", icon: DollarSign, label: "Fuel And Expenses" },
+    { path: "/reports", icon: FileText, label: "Analytics" },
   ];
 
   return (

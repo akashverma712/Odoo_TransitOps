@@ -1,11 +1,118 @@
 // src/components/drivers/DriverList.jsx
 import { useState, useEffect } from "react";
 import { Plus, Search, Edit, Trash2, Eye, User } from "lucide-react";
-import api from "../../config/axios";
 import DriverForm from "./DriverForm";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ErrorAlert from "../common/ErrorAlert";
 import SuccessAlert from "../common/SuccessAlert";
+
+// Dummy data
+const DUMMY_DRIVERS = [
+  {
+    id: 1,
+    full_name: "Rajesh Kumar",
+    license_number: "DL0120210001234",
+    license_category: "HMV",
+    license_expiry_date: "2028-05-15",
+    status: "Available",
+    contact_number: "+91 9876543210",
+    email: "rajesh.kumar@example.in",
+    safety_score: 96,
+    hire_date: "2022-03-10",
+    address: "Laxmi Nagar, New Delhi, Delhi",
+  },
+  {
+    id: 2,
+    full_name: "Amit Sharma",
+    license_number: "MH1420200015678",
+    license_category: "LMV",
+    license_expiry_date: "2027-08-20",
+    status: "On Trip",
+    contact_number: "+91 9123456780",
+    email: "amit.sharma@example.in",
+    safety_score: 91,
+    hire_date: "2021-07-15",
+    address: "Andheri East, Mumbai, Maharashtra",
+  },
+  {
+    id: 3,
+    full_name: "Suresh Yadav",
+    license_number: "UP3220220004567",
+    license_category: "HMV",
+    license_expiry_date: "2027-06-10",
+    status: "Off Duty",
+    contact_number: "+91 9988776655",
+    email: "suresh.yadav@example.in",
+    safety_score: 89,
+    hire_date: "2023-01-20",
+    address: "Alambagh, Lucknow, Uttar Pradesh",
+  },
+  {
+    id: 4,
+    full_name: "Ravi Verma",
+    license_number: "RJ1420210007890",
+    license_category: "Transport",
+    license_expiry_date: "2028-04-25",
+    status: "Available",
+    contact_number: "+91 9871234567",
+    email: "ravi.verma@example.in",
+    safety_score: 98,
+    hire_date: "2022-09-05",
+    address: "Vaishali Nagar, Jaipur, Rajasthan",
+  },
+  {
+    id: 5,
+    full_name: "Mohit Singh",
+    license_number: "HR2620190012345",
+    license_category: "HMV",
+    license_expiry_date: "2028-02-28",
+    status: "On Trip",
+    contact_number: "+91 9812345678",
+    email: "mohit.singh@example.in",
+    safety_score: 87,
+    hire_date: "2021-11-12",
+    address: "Sector 14, Gurugram, Haryana",
+  },
+  {
+    id: 6,
+    full_name: "Sunil Patel",
+    license_number: "GJ0120230009876",
+    license_category: "LMV",
+    license_expiry_date: "2027-12-15",
+    status: "Suspended",
+    contact_number: "+91 9090909090",
+    email: "sunil.patel@example.in",
+    safety_score: 66,
+    hire_date: "2023-05-18",
+    address: "Navrangpura, Ahmedabad, Gujarat",
+  },
+  {
+    id: 7,
+    full_name: "Vikram Chauhan",
+    license_number: "BR0120220011122",
+    license_category: "HMV",
+    license_expiry_date: "2028-03-01",
+    status: "Available",
+    contact_number: "+91 9304567890",
+    email: "vikram.chauhan@example.in",
+    safety_score: 93,
+    hire_date: "2022-06-22",
+    address: "Kankarbagh, Patna, Bihar",
+  },
+  {
+    id: 8,
+    full_name: "Deepak Mishra",
+    license_number: "WB1920210045678",
+    license_category: "Transport",
+    license_expiry_date: "2027-09-12",
+    status: "Off Duty",
+    contact_number: "+91 9830012345",
+    email: "deepak.mishra@example.in",
+    safety_score: 90,
+    hire_date: "2023-08-30",
+    address: "Salt Lake, Kolkata, West Bengal",
+  },
+];
 
 const DriverList = () => {
   const [drivers, setDrivers] = useState([]);
@@ -21,34 +128,21 @@ const DriverList = () => {
   });
 
   useEffect(() => {
-    fetchDrivers();
+    // Simulate API call
+    const timer = setTimeout(() => {
+      setDrivers(DUMMY_DRIVERS);
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
 
-  const fetchDrivers = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get("/drivers");
-      setDrivers(response.data.data || []);
-    } catch (err) {
-      setError("Failed to load drivers");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this driver?")) return;
 
-    try {
-      await api.delete(`/drivers/${id}`);
-      setSuccess("Driver deleted successfully");
-      fetchDrivers();
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError("Failed to delete driver");
-      setTimeout(() => setError(""), 3000);
-    }
+    // Simulate delete
+    setDrivers(drivers.filter(driver => driver.id !== id));
+    setSuccess("Driver deleted successfully");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   const handleEdit = (driver) => {
@@ -61,13 +155,26 @@ const DriverList = () => {
     setEditingDriver(null);
   };
 
-  const handleFormSuccess = () => {
-    fetchDrivers();
-    setSuccess(
-      editingDriver
-        ? "Driver updated successfully"
-        : "Driver created successfully"
-    );
+  const handleFormSuccess = (formData) => {
+    if (editingDriver) {
+      // Update existing driver
+      setDrivers(drivers.map(d => 
+        d.id === editingDriver.id 
+          ? { ...d, ...formData, id: d.id }
+          : d
+      ));
+      setSuccess("Driver updated successfully");
+    } else {
+      // Add new driver
+      const newDriver = {
+        ...formData,
+        id: Math.max(...drivers.map(d => d.id), 0) + 1,
+        safety_score: formData.safety_score || 90,
+        hire_date: formData.hire_date || new Date().toISOString().split('T')[0],
+      };
+      setDrivers([...drivers, newDriver]);
+      setSuccess("Driver created successfully");
+    }
     setTimeout(() => setSuccess(""), 3000);
     handleFormClose();
   };
@@ -222,6 +329,12 @@ const DriverList = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-500">Safety Score</span>
                     <span className="font-medium">{driver.safety_score}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Hire Date</span>
+                    <span className="font-medium">
+                      {new Date(driver.hire_date).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
 

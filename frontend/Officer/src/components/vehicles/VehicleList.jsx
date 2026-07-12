@@ -1,12 +1,102 @@
 // src/components/vehicles/VehicleList.jsx
 import { useState, useEffect } from "react";
 import { Plus, Search, Edit, Trash2, Eye } from "lucide-react";
-import api from "../../config/axios";
 import VehicleForm from "./VehicleForm";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ErrorAlert from "../common/ErrorAlert";
 import SuccessAlert from "../common/SuccessAlert";
 
+// Dummy data
+const DUMMY_VEHICLES = [
+  {
+    id: 1,
+    registration_number: "DL01AB4589",
+    model: "Tata Prima 5530.S",
+    type: "Truck",
+    status: "Available",
+    max_load: 35000,
+    odometer: 184320,
+    year: 2023,
+    color: "White",
+  },
+  {
+    id: 2,
+    registration_number: "MH12CD7621",
+    model: "Mahindra Supro Maxitruck",
+    type: "Mini Truck",
+    status: "On Trip",
+    max_load: 1050,
+    odometer: 68250,
+    year: 2022,
+    color: "Silver",
+  },
+  {
+    id: 3,
+    registration_number: "KA03EF2198",
+    model: "Toyota Innova Crysta",
+    type: "Car",
+    status: "Available",
+    max_load: 600,
+    odometer: 42560,
+    year: 2024,
+    color: "Black",
+  },
+  {
+    id: 4,
+    registration_number: "RJ14GH5543",
+    model: "Ashok Leyland Viking",
+    type: "Bus",
+    status: "In Shop",
+    max_load: 12000,
+    odometer: 267890,
+    year: 2021,
+    color: "Blue",
+  },
+  {
+    id: 5,
+    registration_number: "HR26JK8901",
+    model: "BharatBenz 2823C",
+    type: "Truck",
+    status: "On Trip",
+    max_load: 28000,
+    odometer: 123980,
+    year: 2023,
+    color: "Orange",
+  },
+  {
+    id: 6,
+    registration_number: "GJ01LM3412",
+    model: "Eicher Pro 2049",
+    type: "Light Truck",
+    status: "Retired",
+    max_load: 4900,
+    odometer: 356420,
+    year: 2018,
+    color: "White",
+  },
+  {
+    id: 7,
+    registration_number: "BR01NP7865",
+    model: "Mahindra Bolero Pickup",
+    type: "Pickup",
+    status: "Available",
+    max_load: 1700,
+    odometer: 58740,
+    year: 2024,
+    color: "Silver",
+  },
+  {
+    id: 8,
+    registration_number: "UP32QR6547",
+    model: "Tata Ace Gold",
+    type: "Mini Truck",
+    status: "Available",
+    max_load: 750,
+    odometer: 29480,
+    year: 2024,
+    color: "White",
+  },
+];
 const VehicleList = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,34 +111,21 @@ const VehicleList = () => {
   });
 
   useEffect(() => {
-    fetchVehicles();
+    // Simulate API call
+    const timer = setTimeout(() => {
+      setVehicles(DUMMY_VEHICLES);
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
 
-  const fetchVehicles = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get("/vehicles");
-      setVehicles(response.data.data || []);
-    } catch (err) {
-      setError("Failed to load vehicles");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this vehicle?")) return;
 
-    try {
-      await api.delete(`/vehicles/${id}`);
-      setSuccess("Vehicle deleted successfully");
-      fetchVehicles();
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError("Failed to delete vehicle");
-      setTimeout(() => setError(""), 3000);
-    }
+    // Simulate delete
+    setVehicles(vehicles.filter(vehicle => vehicle.id !== id));
+    setSuccess("Vehicle deleted successfully");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   const handleEdit = (vehicle) => {
@@ -61,13 +138,25 @@ const VehicleList = () => {
     setEditingVehicle(null);
   };
 
-  const handleFormSuccess = () => {
-    fetchVehicles();
-    setSuccess(
-      editingVehicle
-        ? "Vehicle updated successfully"
-        : "Vehicle created successfully"
-    );
+  const handleFormSuccess = (formData) => {
+    if (editingVehicle) {
+      // Update existing vehicle
+      setVehicles(vehicles.map(v => 
+        v.id === editingVehicle.id 
+          ? { ...v, ...formData, id: v.id }
+          : v
+      ));
+      setSuccess("Vehicle updated successfully");
+    } else {
+      // Add new vehicle
+      const newVehicle = {
+        ...formData,
+        id: Math.max(...vehicles.map(v => v.id), 0) + 1,
+        odometer: formData.odometer || 0,
+      };
+      setVehicles([...vehicles, newVehicle]);
+      setSuccess("Vehicle created successfully");
+    }
     setTimeout(() => setSuccess(""), 3000);
     handleFormClose();
   };
@@ -193,6 +282,10 @@ const VehicleList = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-500">Odometer</span>
                   <span className="font-medium">{vehicle.odometer} km</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Year</span>
+                  <span className="font-medium">{vehicle.year}</span>
                 </div>
               </div>
 

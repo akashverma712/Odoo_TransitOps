@@ -7,6 +7,153 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import ErrorAlert from "../common/ErrorAlert";
 import SuccessAlert from "../common/SuccessAlert";
 
+// Dummy data for testing
+const DUMMY_MAINTENANCE = [
+  {
+    id: 1,
+    vehicle_id: 1,
+    status: "In Progress",
+    priority: "High",
+    description: "Engine oil change and filter replacement",
+    scheduled_date: "2026-01-20T10:00:00Z",
+    completed_date: null,
+    cost: null,
+    vehicle: {
+      registration_number: "MH-01-AB-1234",
+      model: "Tata Ace",
+    },
+  },
+  {
+    id: 2,
+    vehicle_id: 2,
+    status: "Completed",
+    priority: "Medium",
+    description: "Brake pad replacement and wheel alignment",
+    scheduled_date: "2026-01-15T14:30:00Z",
+    completed_date: "2026-01-15T16:45:00Z",
+    cost: 4500,
+    vehicle: {
+      registration_number: "KA-02-CD-5678",
+      model: "Ashok Leyland Dost",
+    },
+  },
+  {
+    id: 3,
+    vehicle_id: 3,
+    status: "In Progress",
+    priority: "Urgent",
+    description: "Transmission repair - gear slipping issue",
+    scheduled_date: "2026-01-18T09:00:00Z",
+    completed_date: null,
+    cost: null,
+    vehicle: {
+      registration_number: "DL-03-EF-9012",
+      model: "Eicher Pro 2049",
+    },
+  },
+  {
+    id: 4,
+    vehicle_id: 4,
+    status: "Cancelled",
+    priority: "Low",
+    description: "AC system inspection and gas refill",
+    scheduled_date: "2026-01-12T11:00:00Z",
+    completed_date: null,
+    cost: null,
+    vehicle: {
+      registration_number: "TS-04-GH-3456",
+      model: "BharatBenz 914",
+    },
+  },
+  {
+    id: 5,
+    vehicle_id: 5,
+    status: "Completed",
+    priority: "High",
+    description: "Coolant leak repair and radiator flush",
+    scheduled_date: "2026-01-14T08:30:00Z",
+    completed_date: "2026-01-14T13:20:00Z",
+    cost: 3200,
+    vehicle: {
+      registration_number: "WB-05-IJ-7890",
+      model: "Tata LPT 1109",
+    },
+  },
+  {
+    id: 6,
+    vehicle_id: 6,
+    status: "In Progress",
+    priority: "Medium",
+    description: "Suspension system inspection and bushing replacement",
+    scheduled_date: "2026-01-22T15:00:00Z",
+    completed_date: null,
+    cost: null,
+    vehicle: {
+      registration_number: "GJ-06-KL-1234",
+      model: "Ashok Leyland 3120",
+    },
+  },
+  {
+    id: 7,
+    vehicle_id: 7,
+    status: "Completed",
+    priority: "Low",
+    description: "Tire rotation and balancing",
+    scheduled_date: "2026-01-10T09:45:00Z",
+    completed_date: "2026-01-10T11:30:00Z",
+    cost: 1800,
+    vehicle: {
+      registration_number: "TN-07-MN-5678",
+      model: "Eicher Pro 3010",
+    },
+  },
+  {
+    id: 8,
+    vehicle_id: 8,
+    status: "In Progress",
+    priority: "Urgent",
+    description: "Engine overheating - cylinder head inspection",
+    scheduled_date: "2026-01-19T10:00:00Z",
+    completed_date: null,
+    cost: null,
+    vehicle: {
+      registration_number: "MH-08-OP-9012",
+      model: "BharatBenz 2623",
+    },
+  },
+  {
+    id: 9,
+    vehicle_id: 1,
+    status: "Completed",
+    priority: "Medium",
+    description: "Battery replacement and electrical check",
+    scheduled_date: "2026-01-08T13:00:00Z",
+    completed_date: "2026-01-08T15:15:00Z",
+    cost: 2800,
+    vehicle: {
+      registration_number: "MH-01-AB-1234",
+      model: "Tata Ace",
+    },
+  },
+  {
+    id: 10,
+    vehicle_id: 3,
+    status: "In Progress",
+    priority: "High",
+    description: "Brake system overhaul and ABS check",
+    scheduled_date: "2026-01-23T08:00:00Z",
+    completed_date: null,
+    cost: null,
+    vehicle: {
+      registration_number: "DL-03-EF-9012",
+      model: "Eicher Pro 2049",
+    },
+  },
+];
+
+// Set this to false to use real API, true to use dummy data
+const USE_DUMMY_DATA = true; // Change this to false when you want to use real API
+
 const MaintenanceList = () => {
   const [maintenanceRecords, setMaintenanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,23 +162,39 @@ const MaintenanceList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+  const [useDummyData, setUseDummyData] = useState(USE_DUMMY_DATA);
   const [filters, setFilters] = useState({
     status: "",
     priority: "",
   });
 
   useEffect(() => {
-    fetchMaintenance();
+    fetchMaintenance(useDummyData);
   }, []);
 
-  const fetchMaintenance = async () => {
+  const fetchMaintenance = async (useDummy = false) => {
     try {
       setLoading(true);
-      const response = await api.get("/maintenance");
-      setMaintenanceRecords(response.data.data || []);
+      if (useDummy) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setMaintenanceRecords(DUMMY_MAINTENANCE);
+        setError("");
+      } else {
+        const response = await api.get("/maintenance");
+        setMaintenanceRecords(response.data.data || []);
+      }
     } catch (err) {
-      setError("Failed to load maintenance records");
-      console.error(err);
+      // If API fails, fallback to dummy data
+      if (!useDummy) {
+        console.warn("API failed, falling back to dummy data");
+        setMaintenanceRecords(DUMMY_MAINTENANCE);
+        setError("Using demo data (API connection failed)");
+        setTimeout(() => setError(""), 5000);
+      } else {
+        setError("Failed to load maintenance records");
+        console.error(err);
+      }
     } finally {
       setLoading(false);
     }
@@ -40,10 +203,26 @@ const MaintenanceList = () => {
   const handleCloseMaintenance = async (id) => {
     if (!window.confirm("Close this maintenance record? Vehicle will become available.")) return;
 
+    if (useDummyData) {
+      // Simulate API call for dummy data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setMaintenanceRecords(maintenanceRecords.map(record => 
+        record.id === id ? { 
+          ...record, 
+          status: "Completed",
+          completed_date: new Date().toISOString(),
+          cost: Math.floor(Math.random() * 5000) + 1000 // Random cost for demo
+        } : record
+      ));
+      setSuccess("Maintenance record closed successfully (demo)");
+      setTimeout(() => setSuccess(""), 3000);
+      return;
+    }
+
     try {
       await api.put(`/maintenance/${id}/close`);
       setSuccess("Maintenance record closed successfully");
-      fetchMaintenance();
+      fetchMaintenance(useDummyData);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to close maintenance");
@@ -54,10 +233,19 @@ const MaintenanceList = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this record?")) return;
 
+    if (useDummyData) {
+      // Simulate API call for dummy data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setMaintenanceRecords(maintenanceRecords.filter(record => record.id !== id));
+      setSuccess("Record deleted successfully (demo)");
+      setTimeout(() => setSuccess(""), 3000);
+      return;
+    }
+
     try {
       await api.delete(`/maintenance/${id}`);
       setSuccess("Record deleted successfully");
-      fetchMaintenance();
+      fetchMaintenance(useDummyData);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError("Failed to delete record");
@@ -104,6 +292,11 @@ const MaintenanceList = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Maintenance</h1>
           <p className="text-gray-500">Manage vehicle maintenance records</p>
+          {useDummyData && (
+            <span className="inline-block mt-1 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+              Demo Mode
+            </span>
+          )}
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -264,7 +457,7 @@ const MaintenanceList = () => {
             <MaintenanceForm
               record={editingRecord}
               onSuccess={() => {
-                fetchMaintenance();
+                fetchMaintenance(useDummyData);
                 setShowForm(false);
                 setEditingRecord(null);
                 setSuccess(
