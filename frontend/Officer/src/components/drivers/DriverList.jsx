@@ -47,32 +47,7 @@ const DUMMY_DRIVERS = [
     hire_date: "2023-01-20",
     address: "Alambagh, Lucknow, Uttar Pradesh",
   },
-  {
-    id: 4,
-    full_name: "Ravi Verma",
-    license_number: "RJ1420210007890",
-    license_category: "Transport",
-    license_expiry_date: "2028-04-25",
-    status: "Available",
-    contact_number: "+91 9871234567",
-    email: "ravi.verma@example.in",
-    safety_score: 98,
-    hire_date: "2022-09-05",
-    address: "Vaishali Nagar, Jaipur, Rajasthan",
-  },
-  {
-    id: 5,
-    full_name: "Mohit Singh",
-    license_number: "HR2620190012345",
-    license_category: "HMV",
-    license_expiry_date: "2028-02-28",
-    status: "On Trip",
-    contact_number: "+91 9812345678",
-    email: "mohit.singh@example.in",
-    safety_score: 87,
-    hire_date: "2021-11-12",
-    address: "Sector 14, Gurugram, Haryana",
-  },
+  
   {
     id: 6,
     full_name: "Sunil Patel",
@@ -86,19 +61,7 @@ const DUMMY_DRIVERS = [
     hire_date: "2023-05-18",
     address: "Navrangpura, Ahmedabad, Gujarat",
   },
-  {
-    id: 7,
-    full_name: "Vikram Chauhan",
-    license_number: "BR0120220011122",
-    license_category: "HMV",
-    license_expiry_date: "2028-03-01",
-    status: "Available",
-    contact_number: "+91 9304567890",
-    email: "vikram.chauhan@example.in",
-    safety_score: 93,
-    hire_date: "2022-06-22",
-    address: "Kankarbagh, Patna, Bihar",
-  },
+ 
   {
     id: 8,
     full_name: "Deepak Mishra",
@@ -254,7 +217,7 @@ const DriverList = () => {
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">All Statuses</option>
+            <option value="">All Status</option>
             <option value="Available">Available</option>
             <option value="On Trip">On Trip</option>
             <option value="Off Duty">Off Duty</option>

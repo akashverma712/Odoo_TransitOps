@@ -23,92 +23,97 @@ import {
 
 // Dummy data
 const DUMMY_KPIS = {
-  activeVehicles: 24,
-  availableVehicles: 18,
-  vehiclesInMaintenance: 6,
-  activeTrips: 12,
-  pendingTrips: 8,
-  driversOnDuty: 15,
-  fleetUtilization: 72,
-  totalRevenue: 284500,
-  totalExpenses: 189200,
-  fuelEfficiency: 8.4,
+  activeVehicles: 1,
+  availableVehicles: 1,
+  vehiclesInMaintenance:1 ,
+  activeTrips: 1,
+  pendingTrips: 3,
+  driversOnDuty: 2,
+  fleetUtilization: 67,
+  totalRevenue: 125480, // ₹12.54 Lakhs
+  totalExpenses: 78630, // ₹7.86 Lakhs
+  fuelEfficiency: 6.8, // km/l
 };
 
 const DUMMY_TRIPS = [
   {
     id: 1,
-    source: "New York",
-    destination: "Boston",
+    source: "Delhi",
+    destination: "Jaipur",
     status: "Completed",
-    created_at: "2026-07-10T14:30:00Z",
+    created_at: "2026-07-10T08:30:00Z",
   },
   {
     id: 2,
-    source: "Los Angeles",
-    destination: "San Francisco",
+    source: "Mumbai",
+    destination: "Pune",
     status: "Dispatched",
-    created_at: "2026-07-11T09:15:00Z",
+    created_at: "2026-07-11T09:45:00Z",
   },
-  {
-    id: 3,
-    source: "Chicago",
-    destination: "Detroit",
-    status: "Draft",
-    created_at: "2026-07-11T16:45:00Z",
-  },
-  {
-    id: 4,
-    source: "Miami",
-    destination: "Orlando",
-    status: "Completed",
-    created_at: "2026-07-10T08:20:00Z",
-  },
-  {
-    id: 5,
-    source: "Seattle",
-    destination: "Portland",
-    status: "Dispatched",
-    created_at: "2026-07-11T11:00:00Z",
-  },
+  
 ];
 
 const DUMMY_MAINTENANCE = [
   {
     id: 1,
-    vehicle: { registration_number: "TRUCK-01" },
+    vehicle: {
+      registration_number: "DL01AB4589",
+      model: "Tata Prima 5530.S",
+    },
     priority: "High",
   },
   {
     id: 2,
-    vehicle: { registration_number: "VAN-03" },
+    vehicle: {
+      registration_number: "MH12CD7621",
+      model: "Mahindra Supro Maxitruck",
+    },
     priority: "Medium",
   },
   {
     id: 3,
-    vehicle: { registration_number: "CAR-07" },
-    priority: "Low",
+    vehicle: {
+      registration_number: "RJ14GH5543",
+      model: "Ashok Leyland Viking",
+    },
+    priority: "Urgent",
+  },
+  {
+    id: 4,
+    vehicle: {
+      registration_number: "HR26JK8901",
+      model: "BharatBenz 2823C",
+    },
+    priority: "High",
   },
 ];
 
 const DUMMY_EXPIRING_LICENSES = [
   {
     id: 1,
-    full_name: "John Doe",
-    license_expiry_date: "2026-07-25",
+    full_name: "Rajesh Kumar",
+    license_number: "DL0120210001234",
+    license_expiry_date: "2026-07-28",
   },
   {
     id: 2,
-    full_name: "Sarah Smith",
-    license_expiry_date: "2026-08-05",
+    full_name: "Amit Sharma",
+    license_number: "MH1420200015678",
+    license_expiry_date: "2026-08-04",
   },
   {
     id: 3,
-    full_name: "Mike Johnson",
-    license_expiry_date: "2026-08-15",
+    full_name: "Vikram Chauhan",
+    license_number: "BR0120220011122",
+    license_expiry_date: "2026-08-12",
+  },
+  {
+    id: 4,
+    full_name: "Sunil Patel",
+    license_number: "GJ0120230009876",
+    license_expiry_date: "2026-08-20",
   },
 ];
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -167,7 +172,7 @@ const Dashboard = () => {
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value || 0);
@@ -230,7 +235,6 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-500">Active Vehicles</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">{kpis.activeVehicles}</p>
-              <p className="text-xs text-green-600 mt-1">↑ 12% from last month</p>
             </div>
             <div className="bg-blue-100 p-3 rounded-lg">
               <Truck className="h-6 w-6 text-blue-600" />
@@ -243,7 +247,6 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-500">Available Vehicles</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">{kpis.availableVehicles}</p>
-              <p className="text-xs text-red-600 mt-1">↓ 5% from last month</p>
             </div>
             <div className="bg-green-100 p-3 rounded-lg">
               <Activity className="h-6 w-6 text-green-600" />
@@ -256,7 +259,6 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-500">In Maintenance</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">{kpis.vehiclesInMaintenance}</p>
-              <p className="text-xs text-yellow-600 mt-1">↑ 8% from last month</p>
             </div>
             <div className="bg-yellow-100 p-3 rounded-lg">
               <Wrench className="h-6 w-6 text-yellow-600" />
@@ -269,7 +271,6 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-500">Fleet Utilization</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">{kpis.fleetUtilization}%</p>
-              <p className="text-xs text-green-600 mt-1">↑ 3% from last month</p>
             </div>
             <div className="bg-purple-100 p-3 rounded-lg">
               <TrendingUp className="h-6 w-6 text-purple-600" />
@@ -282,7 +283,6 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-500">Active Trips</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">{kpis.activeTrips}</p>
-              <p className="text-xs text-green-600 mt-1">↑ 15% from last month</p>
             </div>
             <div className="bg-indigo-100 p-3 rounded-lg">
               <MapPin className="h-6 w-6 text-indigo-600" />
@@ -295,7 +295,6 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-500">Pending Trips</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">{kpis.pendingTrips}</p>
-              <p className="text-xs text-yellow-600 mt-1">↓ 2% from last month</p>
             </div>
             <div className="bg-orange-100 p-3 rounded-lg">
               <Clock className="h-6 w-6 text-orange-600" />
@@ -308,7 +307,6 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-500">Drivers On Duty</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">{kpis.driversOnDuty}</p>
-              <p className="text-xs text-green-600 mt-1">↑ 7% from last month</p>
             </div>
             <div className="bg-teal-100 p-3 rounded-lg">
               <Users className="h-6 w-6 text-teal-600" />
@@ -321,7 +319,6 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-500">Fuel Efficiency</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">{kpis.fuelEfficiency} km/L</p>
-              <p className="text-xs text-green-600 mt-1">↑ 4% from last month</p>
             </div>
             <div className="bg-cyan-100 p-3 rounded-lg">
               <Fuel className="h-6 w-6 text-cyan-600" />
@@ -380,28 +377,28 @@ const Dashboard = () => {
           <h3 className="font-semibold text-gray-800 mb-4">Quick Actions</h3>
           <div className="space-y-2">
             <button
-              onClick={() => navigate("/trips/create")}
+              onClick={() => navigate("/trips")}
               className="w-full text-left px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center space-x-2"
             >
               <MapPin className="h-4 w-4" />
               <span>Create New Trip</span>
             </button>
             <button
-              onClick={() => navigate("/vehicles/add")}
+              onClick={() => navigate("/vehicles")}
               className="w-full text-left px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center space-x-2"
             >
               <Truck className="h-4 w-4" />
               <span>Add New Vehicle</span>
             </button>
             <button
-              onClick={() => navigate("/drivers/add")}
+              onClick={() => navigate("/drivers")}
               className="w-full text-left px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center space-x-2"
             >
               <Users className="h-4 w-4" />
               <span>Register New Driver</span>
             </button>
             <button
-              onClick={() => navigate("/maintenance/add")}
+              onClick={() => navigate("/maintenance")}
               className="w-full text-left px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center space-x-2"
             >
               <Wrench className="h-4 w-4" />
@@ -449,53 +446,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Upcoming Maintenance & Expiring Licenses */}
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-          <h3 className="font-semibold text-gray-800 mb-4">Alerts & Notifications</h3>
-          
-          <div className="space-y-4">
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 mb-2">Upcoming Maintenance</h4>
-              {upcomingMaintenance.length === 0 ? (
-                <p className="text-sm text-gray-400">No upcoming maintenance</p>
-              ) : (
-                upcomingMaintenance.slice(0, 3).map((item) => (
-                  <div key={item.id} className="flex justify-between items-center py-1.5 text-sm">
-                    <span className="text-gray-700">{item.vehicle?.registration_number}</span>
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getPriorityColor(item.priority)}`}>
-                      {item.priority}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="border-t border-gray-100 pt-3">
-              <h4 className="text-sm font-medium text-gray-600 mb-2">Expiring Licenses</h4>
-              {expiringLicenses.length === 0 ? (
-                <p className="text-sm text-gray-400">No expiring licenses</p>
-              ) : (
-                expiringLicenses.slice(0, 3).map((driver) => (
-                  <div key={driver.id} className="flex justify-between items-center py-1.5 text-sm">
-                    <span className="text-gray-700">{driver.full_name}</span>
-                    <span className="text-xs text-red-600 font-medium">
-                      {Math.ceil((new Date(driver.license_expiry_date) - new Date()) / (1000 * 60 * 60 * 24))} days
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="border-t border-gray-100 pt-3">
-              <button
-                onClick={() => navigate("/reports")}
-                className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
-              >
-                View Full Report →
-              </button>
-            </div>
-          </div>
-        </div>
+     
       </div>
 
       {/* Recent Activity Feed */}

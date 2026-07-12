@@ -9,28 +9,15 @@ import SuccessAlert from "../common/SuccessAlert";
 
 // Dummy data for testing
 const DUMMY_MAINTENANCE = [
-  {
-    id: 1,
-    vehicle_id: 1,
-    status: "In Progress",
-    priority: "High",
-    description: "Engine oil change and filter replacement",
-    scheduled_date: "2026-01-20T10:00:00Z",
-    completed_date: null,
-    cost: null,
-    vehicle: {
-      registration_number: "MH-01-AB-1234",
-      model: "Tata Ace",
-    },
-  },
+  
   {
     id: 2,
     vehicle_id: 2,
     status: "Completed",
     priority: "Medium",
     description: "Brake pad replacement and wheel alignment",
-    scheduled_date: "2026-01-15T14:30:00Z",
-    completed_date: "2026-01-15T16:45:00Z",
+    scheduled_date: "2026-07-09T14:30:00Z",
+    completed_date: "2026-07-10T16:45:00Z",
     cost: 4500,
     vehicle: {
       registration_number: "KA-02-CD-5678",
@@ -43,7 +30,7 @@ const DUMMY_MAINTENANCE = [
     status: "In Progress",
     priority: "Urgent",
     description: "Transmission repair - gear slipping issue",
-    scheduled_date: "2026-01-18T09:00:00Z",
+    scheduled_date: "2026-07-12T09:00:00Z",
     completed_date: null,
     cost: null,
     vehicle: {
@@ -51,104 +38,7 @@ const DUMMY_MAINTENANCE = [
       model: "Eicher Pro 2049",
     },
   },
-  {
-    id: 4,
-    vehicle_id: 4,
-    status: "Cancelled",
-    priority: "Low",
-    description: "AC system inspection and gas refill",
-    scheduled_date: "2026-01-12T11:00:00Z",
-    completed_date: null,
-    cost: null,
-    vehicle: {
-      registration_number: "TS-04-GH-3456",
-      model: "BharatBenz 914",
-    },
-  },
-  {
-    id: 5,
-    vehicle_id: 5,
-    status: "Completed",
-    priority: "High",
-    description: "Coolant leak repair and radiator flush",
-    scheduled_date: "2026-01-14T08:30:00Z",
-    completed_date: "2026-01-14T13:20:00Z",
-    cost: 3200,
-    vehicle: {
-      registration_number: "WB-05-IJ-7890",
-      model: "Tata LPT 1109",
-    },
-  },
-  {
-    id: 6,
-    vehicle_id: 6,
-    status: "In Progress",
-    priority: "Medium",
-    description: "Suspension system inspection and bushing replacement",
-    scheduled_date: "2026-01-22T15:00:00Z",
-    completed_date: null,
-    cost: null,
-    vehicle: {
-      registration_number: "GJ-06-KL-1234",
-      model: "Ashok Leyland 3120",
-    },
-  },
-  {
-    id: 7,
-    vehicle_id: 7,
-    status: "Completed",
-    priority: "Low",
-    description: "Tire rotation and balancing",
-    scheduled_date: "2026-01-10T09:45:00Z",
-    completed_date: "2026-01-10T11:30:00Z",
-    cost: 1800,
-    vehicle: {
-      registration_number: "TN-07-MN-5678",
-      model: "Eicher Pro 3010",
-    },
-  },
-  {
-    id: 8,
-    vehicle_id: 8,
-    status: "In Progress",
-    priority: "Urgent",
-    description: "Engine overheating - cylinder head inspection",
-    scheduled_date: "2026-01-19T10:00:00Z",
-    completed_date: null,
-    cost: null,
-    vehicle: {
-      registration_number: "MH-08-OP-9012",
-      model: "BharatBenz 2623",
-    },
-  },
-  {
-    id: 9,
-    vehicle_id: 1,
-    status: "Completed",
-    priority: "Medium",
-    description: "Battery replacement and electrical check",
-    scheduled_date: "2026-01-08T13:00:00Z",
-    completed_date: "2026-01-08T15:15:00Z",
-    cost: 2800,
-    vehicle: {
-      registration_number: "MH-01-AB-1234",
-      model: "Tata Ace",
-    },
-  },
-  {
-    id: 10,
-    vehicle_id: 3,
-    status: "In Progress",
-    priority: "High",
-    description: "Brake system overhaul and ABS check",
-    scheduled_date: "2026-01-23T08:00:00Z",
-    completed_date: null,
-    cost: null,
-    vehicle: {
-      registration_number: "DL-03-EF-9012",
-      model: "Eicher Pro 2049",
-    },
-  },
+  
 ];
 
 // Set this to false to use real API, true to use dummy data
@@ -404,7 +294,7 @@ const MaintenanceList = () => {
                 {record.cost && (
                   <div className="flex justify-between">
                     <span className="text-gray-500">Cost</span>
-                    <span className="font-medium">${record.cost}</span>
+                    <span className="font-medium">₹{record.cost}</span>
                   </div>
                 )}
               </div>

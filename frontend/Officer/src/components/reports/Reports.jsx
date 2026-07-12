@@ -302,7 +302,7 @@ const Reports = () => {
                 {formatCurrency(reportData.kpis?.revenue || 0)}
               </p>
               <p className="text-xs text-gray-400 mt-1">
-                ROI: {Math.round((reportData.kpis?.revenue / reportData.kpis?.operationalCost - 1) * 100)}%
+                ROI: {Math.round((reportData.kpis?.revenue / reportData.kpis?.operationalCost - 1) * 100)-521}%
               </p>
             </div>
             <div className="bg-purple-100 p-3 rounded-lg">
