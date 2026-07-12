@@ -178,14 +178,11 @@ export default function OrganisationRegister() {
                       className="w-full text-[14px] text-[#101828] bg-white border border-[#D0D5DD] rounded-lg px-3.5 py-2.5 outline-none focus:border-[#4C4FCE] focus:ring-[3px] focus:ring-[#4C4FCE]/15 transition appearance-none bg-[url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%228%22%20viewBox%3D%220%200%2014%208%22%3E%3Cpath%20d%3D%22M1%201L7%206.5L13%201%22%20stroke%3D%22%2398A2B3%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.9rem_center] pr-9"
                     >
                       <option value="">Select</option>
-                      <option value="NGO">NGO</option>
-                      <option value="Company">Company</option>
-                      <option value="Startup">Startup</option>
-                      <option value="School">School</option>
-                      <option value="College">College</option>
-                      <option value="Hospital">Hospital</option>
-                      <option value="Trust">Trust</option>
-                      <option value="Other">Other</option>
+                      <option value="Logistics Company">Logistics Company</option>
+                      <option value="Transport Company">Transport Company</option>
+                      <option value="Courier Service">Courier Service</option>
+                      <option value="Freight Forwarder">Freight Forwarder</option>
+                      <option value="Construction Company">Construction Company</option>
                     </select>
                   </div>
 
